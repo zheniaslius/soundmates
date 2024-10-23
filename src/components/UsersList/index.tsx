@@ -2,6 +2,7 @@ import { MouseEvent as ReactMouseEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useSpring, type PanInfo } from 'framer-motion';
 import { MoveLeft, MoveRight } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import UserCard from '@components/UsersList/UserCard';
@@ -15,6 +16,7 @@ const CURSOR_SIZE = 60;
 
 export default function UsersList({ data, isLoading }) {
   const containerRef = useRef<HTMLUListElement>(null);
+  const audioRef = useRef(null);
   const itemsRef = useRef<(HTMLLIElement | null)[]>([]);
   const [activeSlide, setActiveSlide] = useState(START_INDEX);
   const canScrollPrev = activeSlide > 0;
@@ -24,6 +26,24 @@ export default function UsersList({ data, isLoading }) {
     damping: 20,
     stiffness: 150,
   });
+
+  const playAudio = (audioUrl) => {
+    const previousAudio = audioRef.current;
+
+    if (previousAudio) {
+      previousAudio.pause();
+      previousAudio.currentTime = 0;
+      previousAudio.src = '';
+      previousAudio.load();
+    }
+
+    const newAudio = new Audio(audioUrl);
+    audioRef.current = newAudio;
+
+    newAudio.play().catch((error) => {
+      console.error('Error playing audio:', error);
+    });
+  };
 
   const [isDragging, setIsDragging] = useState(false);
   function handleDragSnap(_: MouseEvent, { offset: { x: dragOffset } }: PanInfo) {
@@ -152,6 +172,20 @@ export default function UsersList({ data, isLoading }) {
     }
   }
 
+  const getCursorText = () => {
+    if (hoverType === 'none') {
+      return null;
+    }
+    if (hoverType === 'play') {
+      return !audioRef.current?.paused ? (
+        <Pause className="flex justify-center w-[60px]" />
+      ) : (
+        <Play className="flex justify-center w-[60px]" />
+      );
+    }
+    return hoverType ?? 'drag';
+  };
+
   if (!data?.length && !isLoading) return null;
 
   return (
@@ -173,8 +207,7 @@ export default function UsersList({ data, isLoading }) {
             className={cn(
               'grid h-full place-items-center rounded-full bg-lime-300',
               hoverType === 'click' && 'absolute inset-7 h-auto',
-              hoverType === 'play' && 'bg-lime-900',
-              hoverType === 'none' && 'bg-transparent cursor-auto'
+              hoverType === 'none' && 'bg-transparent'
             )}
           >
             <motion.span
@@ -185,7 +218,7 @@ export default function UsersList({ data, isLoading }) {
                 hoverType === 'click' && 'absolute top-full mt-0.5 w-auto text-sm font-bold text-lime-300'
               )}
             >
-              {hoverType === 'none' ? '' : hoverType ?? 'drag'}
+              {getCursorText()}
             </motion.span>
           </motion.div>
         </motion.div>
@@ -244,10 +277,18 @@ export default function UsersList({ data, isLoading }) {
                       ) : (
                         <UserCard
                           data={user}
+                          playAudio={playAudio}
                           mouseEvents={{
                             play: {
                               onMouseEnter: () => setHoverType('play'),
-                              onMouseMove: (e) => navButtonHover(e),
+                              onMouseMove: (e) => {
+                                if (
+                                  e.target.id === 'isPlaying' ||
+                                  e.target.parentElement.id === 'isPlaying'
+                                ) {
+                                  setHoverType('play');
+                                }
+                              },
                               onMouseLeave: () => setHoverType(null),
                             },
                             none: {

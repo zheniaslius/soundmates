@@ -9,15 +9,3 @@ export const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
-export const fetcher = (url: string) => {
-  return api.get(url).then((res) => res.data);
-};
-
-export const postFetcher = (url: string, { arg }) => {
-  return api
-    .post(url, {
-      ...(arg && { data: arg }),
-    })
-    .then((res) => res.data);
-};

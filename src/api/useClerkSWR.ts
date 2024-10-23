@@ -3,7 +3,7 @@ import { useAuth } from '@clerk/clerk-react';
 import { api } from '@api';
 import useSWRMutation from 'swr/mutation';
 
-export default function useClerkSWR(url: string, opts) {
+export default function useClerkSWR(url: string | undefined, opts?: unknown) {
   const { getToken } = useAuth();
 
   const fetcher = async (...args) => {
@@ -13,7 +13,6 @@ export default function useClerkSWR(url: string, opts) {
   };
 
   const postFetcher = async (url, { arg }) => {
-    console.log(await getToken());
     return api
       .post(url, arg, {
         headers: { Authorization: `Bearer ${await getToken()}` },
