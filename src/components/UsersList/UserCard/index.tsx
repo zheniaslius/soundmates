@@ -1,16 +1,12 @@
-import { MessageSquare } from 'lucide-react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@components/ui/carousel';
+import { User } from 'lucide-react';
 import useClerkSWR from '@api/useClerkSWR';
 import { useEffect, useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs';
+import MusicCarousel from './Carousel';
 
 const UserCard = ({ data, mouseEvents, playAudio }) => {
   const [artistId, setArtistId] = useState<string>();
+  const [trackId, setTrackId] = useState<string>();
   const user = data?._id;
   const photo = user?.images?.find((i) => i.url?.includes('height=300'));
   const { useSWR } = useClerkSWR(artistId && `/artists/${artistId}/top-tracks`);
@@ -19,6 +15,16 @@ const UserCard = ({ data, mouseEvents, playAudio }) => {
   useEffect(() => {
     playAudio(artistId ? track?.data : null);
   }, [track, artistId]);
+
+  const playTopTrack = (track) => {
+    if (track.id === trackId) {
+      setTrackId('');
+      playAudio(null);
+    } else {
+      setTrackId(track.id);
+      playAudio(track.preview_url);
+    }
+  };
 
   const handleArtistClick = (artist) => {
     if (artist.id === artistId) {
@@ -29,20 +35,20 @@ const UserCard = ({ data, mouseEvents, playAudio }) => {
   };
 
   return (
-    <div className="flex justify-items-center">
+    <div className="flex justify-items-center min-h-[443px]">
       <div className="relative basis-1/2 pointer-events-none">
         <div className="img">
-          <img src={photo?.url} className="relative z-0 h-full object-cover" />
+          <img src={photo?.url} className="relative z-0 h-full w-full object-cover" />
           <div className="gradient-overlay absolute inset-0"></div>
         </div>
       </div>
-      <div className="relative text-left flex flex-col py-8">
+      <div className="relative basis-1/2 text-left flex flex-col py-8">
         <div className="flex flex-col cursor-pointer">
           <div className="mb-2 font-semibold">
             <span>Favorite genres</span>
           </div>
           <ol
-            className="text-left flex gap-4 text-xs pb-3 mb-5 text-gray-400 max-w-72 overflow-x-scroll"
+            className="text-left flex gap-4 text-xs pb-3 max-w-[20.3rem] mb-5 text-gray-400 overflow-x-scroll"
             onMouseEnter={mouseEvents.none.onMouseEnter}
             onMouseLeave={mouseEvents.none.onMouseLeave}
             onMouseMove={mouseEvents.none.onMouseMove}
@@ -54,56 +60,57 @@ const UserCard = ({ data, mouseEvents, playAudio }) => {
             ))}
           </ol>
         </div>
-        <div className="mb-2">
-          <div className="mb-2 font-semibold">
-            <span>You both listen to</span>
+        <Tabs defaultValue="matches">
+          <TabsList className="mb-1">
+            <TabsTrigger value="matches">You both listen</TabsTrigger>
+            <TabsTrigger value="songs">Top songs</TabsTrigger>
+          </TabsList>
+          <TabsContent value="matches" className="pr-[60px]">
+            <MusicCarousel
+              getImgSrc={(artist) => artist.images?.[2]?.url}
+              data={data?.matchingArtists}
+              onClick={handleArtistClick}
+              mouseEvents={{
+                ...mouseEvents,
+                play: {
+                  ...mouseEvents.play,
+                  onMouseMove: (artist) => {
+                    mouseEvents.play.onMouseMove(artist.id === artistId);
+                  },
+                },
+              }}
+            />
+          </TabsContent>
+          <TabsContent value="songs" className="pr-[60px]">
+            <MusicCarousel
+              getImgSrc={(track) => track.album.images?.[2]?.url}
+              data={user?.topTracks}
+              onClick={playTopTrack}
+              mouseEvents={{
+                ...mouseEvents,
+                play: {
+                  ...mouseEvents.play,
+                  onMouseMove: (track) => {
+                    mouseEvents.play.onMouseMove(track.id === trackId);
+                  },
+                },
+              }}
+            />
+          </TabsContent>
+        </Tabs>
+        {user?.socialUrl && (
+          <div className="mt-7">
+            <button
+              className="flex items-center gap-1 bg-lime-300 rounded-full py-3 px-5 shadow-bottom"
+              onMouseEnter={mouseEvents.none.onMouseEnter}
+              onMouseLeave={mouseEvents.none.onMouseLeave}
+              onMouseMove={mouseEvents.none.onMouseMove}
+            >
+              <User />
+              <span>Social media</span>
+            </button>
           </div>
-          <Carousel
-            opts={{
-              align: 'start',
-              watchDrag: false,
-            }}
-            className="max-w-80"
-          >
-            <CarouselContent>
-              {data?.matchingArtists?.map((artist, index) => (
-                <CarouselItem
-                  key={artist.id}
-                  id={artist.id === artistId ? 'isPlaying' : ''}
-                  className="lg:basis-1/3"
-                  onClick={() => handleArtistClick(artist)}
-                  onMouseEnter={mouseEvents.play.onMouseEnter}
-                  onMouseLeave={mouseEvents.play.onMouseLeave}
-                  onMouseMove={mouseEvents.play.onMouseMove}
-                >
-                  <img src={artist.images?.[2]?.url} className="w-full aspect-square object-cover mb-1" />
-                  <span className="text-base">{artist.name}</span>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious
-              onMouseEnter={mouseEvents.none.onMouseEnter}
-              onMouseLeave={mouseEvents.none.onMouseLeave}
-              onMouseMove={mouseEvents.none.onMouseMove}
-            />
-            <CarouselNext
-              onMouseEnter={mouseEvents.none.onMouseEnter}
-              onMouseLeave={mouseEvents.none.onMouseLeave}
-              onMouseMove={mouseEvents.none.onMouseMove}
-            />
-          </Carousel>
-        </div>
-        <div className="mx-auto mt-auto">
-          <button
-            className="flex items-center gap-3 bg-lime-300 rounded-full py-3.5 px-9 shadow-bottom"
-            onMouseEnter={mouseEvents.none.onMouseEnter}
-            onMouseLeave={mouseEvents.none.onMouseLeave}
-            onMouseMove={mouseEvents.none.onMouseMove}
-          >
-            <MessageSquare className="h-5 w-5" />
-            <span>Social account</span>
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );

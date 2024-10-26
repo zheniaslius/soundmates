@@ -32,11 +32,7 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-    <SWRConfig
-      value={{
-        fetcher,
-      }}
-    >
+    <SWRConfig>
       <RouterProvider router={router} />
     </SWRConfig>
   </ThemeProvider>

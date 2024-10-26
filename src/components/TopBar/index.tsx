@@ -35,7 +35,7 @@ const TopBar = (props: Props) => {
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <Cog6ToothIcon height={17} className="mr-1.5" />
-              <Link to={'/dashboard/settings'}>Settings</Link>
+              <Link to={'/dashboard/settings'}>Profile Settings</Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />

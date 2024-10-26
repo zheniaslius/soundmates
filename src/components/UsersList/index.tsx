@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import UserCard from '@components/UsersList/UserCard';
 import Skeleton from '@components/UsersList/UserCard/Skeleton';
 
-const START_INDEX = 1;
+const START_INDEX = 0;
 const DRAG_THRESHOLD = 150;
 const FALLBACK_WIDTH = 509;
 
@@ -16,7 +16,7 @@ const CURSOR_SIZE = 60;
 
 export default function UsersList({ data, isLoading }) {
   const containerRef = useRef<HTMLUListElement>(null);
-  const audioRef = useRef(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const itemsRef = useRef<(HTMLLIElement | null)[]>([]);
   const [activeSlide, setActiveSlide] = useState(START_INDEX);
   const canScrollPrev = activeSlide > 0;
@@ -37,12 +37,20 @@ export default function UsersList({ data, isLoading }) {
       previousAudio.load();
     }
 
+    if (!audioUrl) {
+      setHoverType('play');
+      return;
+    }
+
     const newAudio = new Audio(audioUrl);
     audioRef.current = newAudio;
 
-    newAudio.play().catch((error) => {
-      console.error('Error playing audio:', error);
-    });
+    newAudio
+      .play()
+      .then(() => setHoverType('pause'))
+      .catch((error) => {
+        console.error('Error playing audio:', error);
+      });
   };
 
   const [isDragging, setIsDragging] = useState(false);
@@ -110,25 +118,47 @@ export default function UsersList({ data, isLoading }) {
     }
   }
 
-  function scrollPrev() {
-    //prevent scrolling past first item
-    if (!canScrollPrev) return;
+  function getOffsetXForSlide(index) {
+    if (!containerRef.current || !itemsRef.current[index]) return 0;
 
-    const nextWidth = itemsRef.current.at(activeSlide - 1)?.getBoundingClientRect().width;
-    if (nextWidth === undefined) return;
-    offsetX.set(offsetX.get() + nextWidth);
+    const containerWidth = containerRef.current.offsetWidth;
+    let cumulativeWidth = 0;
+    const gap = 40; // Adjust if your gap size is different
 
-    setActiveSlide((prev) => prev - 1);
+    for (let i = 0; i < index; i++) {
+      const item = itemsRef.current[i];
+      if (item) {
+        cumulativeWidth += item.offsetWidth + gap;
+      }
+    }
+
+    const activeItem = itemsRef.current[index];
+    const activeItemWidth = activeItem.offsetWidth;
+
+    const totalWidth = cumulativeWidth + activeItemWidth / 2;
+    const offset = containerWidth / 2 - totalWidth;
+
+    return offset;
   }
+
   function scrollNext() {
-    // prevent scrolling past last item
     if (!canScrollNext) return;
 
-    const nextWidth = itemsRef.current.at(activeSlide + 1)?.getBoundingClientRect().width;
-    if (nextWidth === undefined) return;
-    offsetX.set(offsetX.get() - nextWidth);
+    const newActiveSlide = activeSlide + 1;
+    const newOffsetX = getOffsetXForSlide(newActiveSlide);
 
-    setActiveSlide((prev) => prev + 1);
+    offsetX.set(newOffsetX);
+    setActiveSlide(newActiveSlide);
+  }
+
+  function scrollPrev() {
+    if (!canScrollPrev) return;
+
+    const newActiveSlide = activeSlide - 1;
+    const newOffsetX = getOffsetXForSlide(newActiveSlide);
+
+    offsetX.set(newOffsetX);
+    setActiveSlide(newActiveSlide);
   }
 
   const [hoverType, setHoverType] = useState<'prev' | 'next' | 'click' | null>(null);
@@ -176,12 +206,14 @@ export default function UsersList({ data, isLoading }) {
     if (hoverType === 'none') {
       return null;
     }
+    if (hoverType === 'click') {
+      return 'spotify';
+    }
     if (hoverType === 'play') {
-      return !audioRef.current?.paused ? (
-        <Pause className="flex justify-center w-[60px]" />
-      ) : (
-        <Play className="flex justify-center w-[60px]" />
-      );
+      return <Play className="flex justify-center w-[65px]" />;
+    }
+    if (hoverType === 'pause') {
+      return <Pause className="flex justify-center w-[60px]" />;
     }
     return hoverType ?? 'drag';
   };
@@ -189,8 +221,11 @@ export default function UsersList({ data, isLoading }) {
   if (!data?.length && !isLoading) return null;
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
-      <div className="group mx-6 mt-36">
+    <div className="min-h-screen overflow-x-hidden container mt-24">
+      <div className="mb-9">
+        <h1 className="text-4xl font-bold">Your matches</h1>
+      </div>
+      <div className="group mx-6 ">
         <motion.div
           className={cn(
             'pointer-events-none absolute z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100'
@@ -206,7 +241,7 @@ export default function UsersList({ data, isLoading }) {
             layout
             className={cn(
               'grid h-full place-items-center rounded-full bg-lime-300',
-              hoverType === 'click' && 'absolute inset-7 h-auto',
+              hoverType === 'click' && 'absolute inset-5 h-auto',
               hoverType === 'none' && 'bg-transparent'
             )}
           >
@@ -281,13 +316,10 @@ export default function UsersList({ data, isLoading }) {
                           mouseEvents={{
                             play: {
                               onMouseEnter: () => setHoverType('play'),
-                              onMouseMove: (e) => {
-                                if (
-                                  e.target.id === 'isPlaying' ||
-                                  e.target.parentElement.id === 'isPlaying'
-                                ) {
-                                  setHoverType('play');
-                                }
+                              onMouseMove: (isHoverAndPlay) => {
+                                if (isHoverAndPlay) {
+                                  audioRef.current ? setHoverType('pause') : setHoverType('play');
+                                } else setHoverType('play');
                               },
                               onMouseLeave: () => setHoverType(null),
                             },
@@ -323,25 +355,27 @@ export default function UsersList({ data, isLoading }) {
               );
             })}
           </motion.ul>
+          {canScrollPrev && (
+            <button
+              type="button"
+              className="group absolute left-[10%] top-1/3 z-20 grid aspect-square place-content-center rounded-full transition-colors"
+              style={{
+                width: CURSOR_SIZE,
+                height: CURSOR_SIZE,
+              }}
+              onClick={scrollPrev}
+              disabled={!canScrollPrev}
+              onMouseEnter={() => setHoverType('prev')}
+              onMouseMove={(e) => navButtonHover(e)}
+              onMouseLeave={() => setHoverType(null)}
+            >
+              <span className="sr-only">Previous Guide</span>
+              <MoveLeft className="h-10 w-10 stroke-[1.5] transition-colors group-enabled:group-hover:text-gray-900 group-disabled:opacity-50" />
+            </button>
+          )}
           <button
             type="button"
-            className="group absolute left-[24%] top-1/3 z-20 grid aspect-square place-content-center rounded-full transition-colors"
-            style={{
-              width: CURSOR_SIZE,
-              height: CURSOR_SIZE,
-            }}
-            onClick={scrollPrev}
-            disabled={!canScrollPrev}
-            onMouseEnter={() => setHoverType('prev')}
-            onMouseMove={(e) => navButtonHover(e)}
-            onMouseLeave={() => setHoverType(null)}
-          >
-            <span className="sr-only">Previous Guide</span>
-            <MoveLeft className="h-10 w-10 stroke-[1.5] transition-colors group-enabled:group-hover:text-gray-900 group-disabled:opacity-50" />
-          </button>
-          <button
-            type="button"
-            className="group absolute right-[31%] top-1/3 z-20 grid aspect-square place-content-center rounded-full transition-colors"
+            className="group absolute right-[10%] top-1/3 z-20 grid aspect-square place-content-center rounded-full transition-colors"
             style={{
               width: CURSOR_SIZE,
               height: CURSOR_SIZE,

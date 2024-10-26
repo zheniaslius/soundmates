@@ -2,6 +2,7 @@ import { Button } from '@components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import Spotify from '@assets/spotify-2.svg?react';
 import Sound from '@assets/noun-sound-4888408.svg?react';
+import { SignInButton } from '@clerk/clerk-react';
 
 const Login = () => {
   return (
