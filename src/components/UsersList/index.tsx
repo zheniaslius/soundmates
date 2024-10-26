@@ -260,7 +260,7 @@ export default function UsersList({ data, isLoading }) {
         <div className="relative">
           <motion.ul
             ref={containerRef}
-            className="flex gap-10 cursor-none items-start"
+            className="flex gap-20 cursor-none items-start"
             style={{
               x: animatedX,
             }}
@@ -291,7 +291,7 @@ export default function UsersList({ data, isLoading }) {
                   ref={(el) => (itemsRef.current[index] = el)}
                   className={cn(
                     'group relative shrink-0 select-none px-3 transition-opacity duration-300',
-                    !active && 'opacity-30'
+                    !active && 'opacity-40 blur-sm pointer-events-none'
                   )}
                   transition={{
                     ease: 'easeInOut',
@@ -302,11 +302,7 @@ export default function UsersList({ data, isLoading }) {
                   }}
                 >
                   <div className="block" draggable={false} onClick={disableDragClick}>
-                    <div
-                      className={cn(
-                        'grid overflow-hidden rounded-lg bg-brand-bg border-2 border-solid border-brand-border'
-                      )}
-                    >
+                    <div className={cn('grid overflow-hidden rounded-lg bg-brand-bg')}>
                       {isLoading ? (
                         <Skeleton />
                       ) : (

@@ -65,7 +65,7 @@ const UserCard = ({ data, mouseEvents, playAudio }) => {
             <TabsTrigger value="matches">You both listen</TabsTrigger>
             <TabsTrigger value="songs">Top songs</TabsTrigger>
           </TabsList>
-          <TabsContent value="matches" className="pr-[60px]">
+          <TabsContent value="matches" className="pr-[80px]">
             <MusicCarousel
               getImgSrc={(artist) => artist.images?.[2]?.url}
               data={data?.matchingArtists}
@@ -81,7 +81,7 @@ const UserCard = ({ data, mouseEvents, playAudio }) => {
               }}
             />
           </TabsContent>
-          <TabsContent value="songs" className="pr-[60px]">
+          <TabsContent value="songs" className="pr-[80px]">
             <MusicCarousel
               getImgSrc={(track) => track.album.images?.[2]?.url}
               data={user?.topTracks}

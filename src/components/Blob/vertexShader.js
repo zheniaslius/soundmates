@@ -1,6 +1,7 @@
 const vertexShader = `
 uniform float u_intensity;
 uniform float u_time;
+uniform float u_noiseSpeed; // Add this uniform
 
 varying vec2 vUv;
 varying float vDisplacement;
@@ -90,13 +91,11 @@ float cnoise(vec3 P) {
 
 // End of Perlin Noise Code
 
-
 void main() {
     vUv = uv;
 
-    // Use a separate speed factor for noise animation
-    float noiseSpeed = 0.5; // Lower value slows down the noise
-    vDisplacement = cnoise(position + vec3(noiseSpeed * u_time));
+    // Use the uniform for noise speed
+    vDisplacement = cnoise(position + vec3(u_noiseSpeed * u_time));
 
     vec3 newPosition = position + normal * (u_intensity * vDisplacement);
 

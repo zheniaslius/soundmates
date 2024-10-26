@@ -17,6 +17,8 @@ const Blob = () => {
     () => ({
       u_time: { value: 0 },
       u_intensity: { value: 0 },
+      u_noiseSpeed: { value: 0.5 }, // Default idle value
+      u_distortionSpeed: { value: 0.8 }, // Default idle value
     }),
     []
   );
@@ -31,7 +33,7 @@ const Blob = () => {
 
       // Load Audio
       audio = new Audio(
-        'https://p.scdn.co/mp3-preview/7b4cec8b66ec062e67672dcd728d0bbe8654865a?cid=b30c1a206f264d549b8da6e1da1bdaf9'
+        'https://p.scdn.co/mp3-preview/806a36ed9b464a6ff75930eb179f9982524fed3c?cid=b30c1a206f264d549b8da6e1da1bdaf9'
       );
       audio.crossOrigin = 'anonymous';
       await audio.play();
@@ -99,6 +101,10 @@ const Blob = () => {
           intensity,
           0.1 // Adjust smoothing factor as needed
         );
+
+        // Set speed factors for active music playback (matching old behavior)
+        mesh.current.material.uniforms.u_noiseSpeed.value = 1.0;
+        mesh.current.material.uniforms.u_distortionSpeed.value = 1.0;
       } else {
         // Slowed down Idle Animation
         const idleTime = clock.getElapsedTime() * idleSpeedFactor;
@@ -108,6 +114,10 @@ const Blob = () => {
           idleIntensity,
           0.05 // Lower smoothing factor for smoother transitions
         );
+
+        // Set speed factors for idle state
+        mesh.current.material.uniforms.u_noiseSpeed.value = 0.5;
+        mesh.current.material.uniforms.u_distortionSpeed.value = 0.8;
       }
     }
   });
