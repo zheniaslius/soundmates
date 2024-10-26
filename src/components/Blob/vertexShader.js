@@ -94,15 +94,13 @@ float cnoise(vec3 P) {
 void main() {
     vUv = uv;
 
-    vDisplacement = cnoise(position + vec3(2.0 * u_time));
-  
+    // Use a separate speed factor for noise animation
+    float noiseSpeed = 0.5; // Lower value slows down the noise
+    vDisplacement = cnoise(position + vec3(noiseSpeed * u_time));
+
     vec3 newPosition = position + normal * (u_intensity * vDisplacement);
-  
-    vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
-    vec4 viewPosition = viewMatrix * modelPosition;
-    vec4 projectedPosition = projectionMatrix * viewPosition;
-  
-    gl_Position = projectedPosition;
+
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(newPosition, 1.0);
 }
 `;
 
