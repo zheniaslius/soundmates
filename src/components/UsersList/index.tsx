@@ -121,10 +121,10 @@ export default function UsersList({ data, isLoading }) {
   function getOffsetXForSlide(index) {
     if (!containerRef.current || !itemsRef.current[index]) return 0;
 
-    const containerWidth = containerRef.current.offsetWidth;
     let cumulativeWidth = 0;
-    const gap = 40; // Adjust if your gap size is different
+    const gap = 80; // Adjust if your gap size is different
 
+    // Accumulate the width of each previous item plus the gap
     for (let i = 0; i < index; i++) {
       const item = itemsRef.current[i];
       if (item) {
@@ -132,13 +132,8 @@ export default function UsersList({ data, isLoading }) {
       }
     }
 
-    const activeItem = itemsRef.current[index];
-    const activeItemWidth = activeItem.offsetWidth;
-
-    const totalWidth = cumulativeWidth + activeItemWidth / 2;
-    const offset = containerWidth / 2 - totalWidth;
-
-    return offset;
+    // Directly return the cumulative width to align from the start
+    return -cumulativeWidth;
   }
 
   function scrollNext() {
@@ -225,7 +220,7 @@ export default function UsersList({ data, isLoading }) {
       <div className="mb-9">
         <h1 className="text-4xl font-bold">Your matches</h1>
       </div>
-      <div className="group mx-6 ">
+      <div className="group ">
         <motion.div
           className={cn(
             'pointer-events-none absolute z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100'
@@ -290,8 +285,8 @@ export default function UsersList({ data, isLoading }) {
                   key={user?._id?._id}
                   ref={(el) => (itemsRef.current[index] = el)}
                   className={cn(
-                    'group relative shrink-0 select-none px-3 transition-opacity duration-300',
-                    !active && 'opacity-40 blur-sm pointer-events-none'
+                    'group relative shrink-0 select-none transition-opacity duration-300',
+                    !active && 'opacity-70 blur-sm pointer-events-none'
                   )}
                   transition={{
                     ease: 'easeInOut',

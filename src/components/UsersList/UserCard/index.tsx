@@ -1,5 +1,5 @@
 import { User } from 'lucide-react';
-import useClerkSWR from '@api/useClerkSWR';
+import { useClerkMutation } from '@api/useClerkSWR';
 import { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs';
 import MusicCarousel from './Carousel';
@@ -9,12 +9,15 @@ const UserCard = ({ data, mouseEvents, playAudio }) => {
   const [trackId, setTrackId] = useState<string>();
   const user = data?._id;
   const photo = user?.images?.find((i) => i.url?.includes('height=300'));
-  const { useSWR } = useClerkSWR(artistId && `/artists/${artistId}/top-tracks`);
-  const { data: track } = useSWR;
+  const { data: track, trigger } = useClerkMutation(artistId && `/artists/${artistId}/top-tracks`, 'get');
 
   useEffect(() => {
     playAudio(artistId ? track?.data : null);
   }, [track, artistId]);
+
+  useEffect(() => {
+    trigger();
+  }, [trigger, artistId]);
 
   const playTopTrack = (track) => {
     if (track.id === trackId) {
@@ -99,15 +102,15 @@ const UserCard = ({ data, mouseEvents, playAudio }) => {
           </TabsContent>
         </Tabs>
         {user?.socialUrl && (
-          <div className="mt-7">
+          <div className="mt-7 ml-16 mb-2">
             <button
-              className="flex items-center gap-1 bg-lime-300 rounded-full py-3 px-5 shadow-bottom"
+              className="flex items-center gap-1 bg-lime-300 hover:brightness-75 rounded-full py-3 px-5 shadow-bottom"
               onMouseEnter={mouseEvents.none.onMouseEnter}
               onMouseLeave={mouseEvents.none.onMouseLeave}
               onMouseMove={mouseEvents.none.onMouseMove}
             >
-              <User />
-              <span>Social media</span>
+              <User className="text-brand-dark" />
+              <span className="text-brand-dark">Social media</span>
             </button>
           </div>
         )}

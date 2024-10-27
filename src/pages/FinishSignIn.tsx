@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { Input } from '@/components/ui/input';
 import useStore from '@store';
 import { ReloadIcon } from '@radix-ui/react-icons';
-import useClerkSWR from '@api/useClerkSWR';
+import { useClerkMutation } from '@api/useClerkSWR';
 
 import { z } from 'zod';
 
@@ -19,8 +19,7 @@ const formSchema = z.object({
 
 const FinishSignIn = (props: Props) => {
   const { accessToken, setUser } = useStore();
-  const { useSWRMutation } = useClerkSWR('/auth/sign-in');
-  const { trigger, isMutating } = useSWRMutation;
+  const { trigger, isMutating } = useClerkMutation('/auth/sign-in', 'post');
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,7 +45,7 @@ const FinishSignIn = (props: Props) => {
     <Card className="card">
       <CardHeader className="text-center pt-0">
         <Sound className="h-16 w-16 fill-brand-lime mx-auto" />
-        <CardTitle className="text-xl text-brand-gray-100">Link a social account</CardTitle>
+        <CardTitle className="text-xl text-brand-gray-100">Link a social media</CardTitle>
         <CardDescription>So people can chat you</CardDescription>
       </CardHeader>
       <CardContent className="text-center">

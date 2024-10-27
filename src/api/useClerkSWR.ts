@@ -3,22 +3,26 @@ import { useAuth } from '@clerk/clerk-react';
 import { api } from '@api';
 import useSWRMutation from 'swr/mutation';
 
-export default function useClerkSWR(url: string | undefined, opts?: unknown) {
+export function useClerkMutation(url: string, method: 'get' | 'post' | 'put' | 'delete' | 'patch' = 'post') {
   const { getToken } = useAuth();
 
-  const fetcher = async (...args) => {
-    return api(...args, {
-      headers: { Authorization: `Bearer ${await getToken()}` },
-    }).then((res) => res.data);
+  const fetcher = async (url, { arg }) => {
+    const token = await getToken();
+    const headers = { Authorization: `Bearer ${token}` };
+
+    if (method === 'get') {
+      // For GET requests
+      return api
+        .get(url, {
+          headers,
+          ...(arg && { params: arg }),
+        })
+        .then((res) => res.data);
+    } else {
+      // For POST, PUT, DELETE, PATCH
+      return api[method](url, arg, { headers }).then((res) => res.data);
+    }
   };
 
-  const postFetcher = async (url, { arg }) => {
-    return api
-      .post(url, arg, {
-        headers: { Authorization: `Bearer ${await getToken()}` },
-      })
-      .then((res) => res.data);
-  };
-
-  return { useSWR: useSWR(url, fetcher, opts), useSWRMutation: useSWRMutation(url, postFetcher) };
+  return useSWRMutation(url, fetcher);
 }
