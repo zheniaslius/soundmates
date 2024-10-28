@@ -7,6 +7,7 @@ import { Play, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import UserCard from '@components/UsersList/UserCard';
 import Skeleton from '@components/UsersList/UserCard/Skeleton';
+import useAudioStore from '@store/audioStore';
 
 const START_INDEX = 0;
 const DRAG_THRESHOLD = 150;
@@ -15,6 +16,7 @@ const FALLBACK_WIDTH = 509;
 const CURSOR_SIZE = 60;
 
 export default function UsersList({ data, isLoading }) {
+  const { audioUrl } = useAudioStore();
   const containerRef = useRef<HTMLUListElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const itemsRef = useRef<(HTMLLIElement | null)[]>([]);
@@ -26,32 +28,6 @@ export default function UsersList({ data, isLoading }) {
     damping: 20,
     stiffness: 150,
   });
-
-  const playAudio = (audioUrl) => {
-    const previousAudio = audioRef.current;
-
-    if (previousAudio) {
-      previousAudio.pause();
-      previousAudio.currentTime = 0;
-      previousAudio.src = '';
-      previousAudio.load();
-    }
-
-    if (!audioUrl) {
-      setHoverType('play');
-      return;
-    }
-
-    const newAudio = new Audio(audioUrl);
-    audioRef.current = newAudio;
-
-    newAudio
-      .play()
-      .then(() => setHoverType('pause'))
-      .catch((error) => {
-        console.error('Error playing audio:', error);
-      });
-  };
 
   const [isDragging, setIsDragging] = useState(false);
   function handleDragSnap(_: MouseEvent, { offset: { x: dragOffset } }: PanInfo) {
@@ -281,12 +257,12 @@ export default function UsersList({ data, isLoading }) {
               const active = index === activeSlide;
               return (
                 <motion.li
-                  layout
+                  layout="position"
                   key={user?._id?._id}
                   ref={(el) => (itemsRef.current[index] = el)}
                   className={cn(
                     'group relative shrink-0 select-none transition-opacity duration-300',
-                    !active && 'opacity-70 blur-sm pointer-events-none'
+                    !active && 'opacity-90 blur-sm pointer-events-none'
                   )}
                   transition={{
                     ease: 'easeInOut',
@@ -303,13 +279,12 @@ export default function UsersList({ data, isLoading }) {
                       ) : (
                         <UserCard
                           data={user}
-                          playAudio={playAudio}
                           mouseEvents={{
                             play: {
                               onMouseEnter: () => setHoverType('play'),
                               onMouseMove: (isHoverAndPlay) => {
                                 if (isHoverAndPlay) {
-                                  audioRef.current ? setHoverType('pause') : setHoverType('play');
+                                  audioUrl ? setHoverType('pause') : setHoverType('play');
                                 } else setHoverType('play');
                               },
                               onMouseLeave: () => setHoverType(null),

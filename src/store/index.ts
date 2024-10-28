@@ -5,24 +5,21 @@ import { AccessToken } from '@spotify/web-api-ts-sdk';
 
 type Store = {
   user: null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
   accessToken?: AccessToken;
-  requestLoading: boolean;
+  audioUrl?: string;
   setUser: (user: unknown) => void;
   setToken: (accessToken: AccessToken) => void;
-  setRequestLoading: (isLoading: boolean) => void;
 };
 
 const useStore = create<Store>(
   devtools(
     persist(
       (set) => ({
-        isAuthenticated: false,
         accessToken: {},
         user: null,
-        isLoading: false,
+        audioUrl: null,
 
+        setAudioUrl: (url) => set({ audioUrl: url }),
         setUser: (user) => set(() => ({ user })),
         setToken: (accessToken) => set(() => ({ accessToken })),
         setStore: (newState) => set((state) => ({ ...state, ...newState })),

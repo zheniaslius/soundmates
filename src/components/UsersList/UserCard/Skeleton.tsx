@@ -1,4 +1,3 @@
-import { MessageSquare } from 'lucide-react';
 import {
   Carousel,
   CarouselContent,
@@ -6,7 +5,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@components/ui/carousel';
-import { Card, CardContent } from '@/components/ui/card';
 
 const Skeleton = () => {
   return (
@@ -30,7 +28,7 @@ const Skeleton = () => {
         </div>
         <div className="mb-5">
           <div className="mb-2 font-semibold">
-            <span>You both listen to</span>
+            <span>You both listen</span>
           </div>
           <Carousel
             opts={{

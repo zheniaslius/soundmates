@@ -3,29 +3,37 @@ import { useClerkMutation } from '@api/useClerkSWR';
 import { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs';
 import MusicCarousel from './Carousel';
+import { UsersIcon, MusicalNoteIcon } from '@heroicons/react/20/solid';
+import useAudioStore from '@store/audioStore';
+import { extractColors } from 'extract-colors';
 
 const UserCard = ({ data, mouseEvents, playAudio }) => {
   const [artistId, setArtistId] = useState<string>();
   const [trackId, setTrackId] = useState<string>();
+  const { audioUrl, setAudioUrl } = useAudioStore();
   const user = data?._id;
   const photo = user?.images?.find((i) => i.url?.includes('height=300'));
-  const { data: track, trigger } = useClerkMutation(artistId && `/artists/${artistId}/top-tracks`, 'get');
+  const { data: trackData, trigger } = useClerkMutation(artistId && `/artists/${artistId}/top-tracks`, 'get');
 
-  useEffect(() => {
-    playAudio(artistId ? track?.data : null);
-  }, [track, artistId]);
+  // useEffect(() => {
+  //   playAudio(artistId ? trackData?.data : null);
+  // }, [trackData, artistId]);
 
   useEffect(() => {
     trigger();
   }, [trigger, artistId]);
 
+  useEffect(() => {
+    extractColors(photo?.url).then(console.log).catch(console.error);
+  }, [photo?.url]);
+
   const playTopTrack = (track) => {
     if (track.id === trackId) {
       setTrackId('');
-      playAudio(null);
+      setAudioUrl('');
     } else {
       setTrackId(track.id);
-      playAudio(track.preview_url);
+      setAudioUrl(track.preview_url);
     }
   };
 
@@ -38,7 +46,7 @@ const UserCard = ({ data, mouseEvents, playAudio }) => {
   };
 
   return (
-    <div className="flex justify-items-center min-h-[443px]">
+    <div className="flex justify-items-center min-h-[455px]">
       <div className="relative basis-1/2 pointer-events-none">
         <div className="img">
           <img src={photo?.url} className="relative z-0 h-full w-full object-cover" />
@@ -65,8 +73,14 @@ const UserCard = ({ data, mouseEvents, playAudio }) => {
         </div>
         <Tabs defaultValue="matches">
           <TabsList className="mb-1">
-            <TabsTrigger value="matches">You both listen</TabsTrigger>
-            <TabsTrigger value="songs">Top songs</TabsTrigger>
+            <TabsTrigger value="matches">
+              <UsersIcon height={16} className="mr-1" />
+              You both listen
+            </TabsTrigger>
+            <TabsTrigger value="songs">
+              <MusicalNoteIcon height={16} className="mr-1" />
+              Top songs
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="matches" className="pr-[80px]">
             <MusicCarousel

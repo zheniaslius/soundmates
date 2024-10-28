@@ -1,7 +1,7 @@
 const vertexShader = `
 uniform float u_intensity;
 uniform float u_time;
-uniform float u_noiseSpeed; // Add this uniform
+uniform float u_noiseSpeed;
 
 varying vec2 vUv;
 varying float vDisplacement;
@@ -94,8 +94,8 @@ float cnoise(vec3 P) {
 void main() {
     vUv = uv;
 
-    // Use the uniform for noise speed
-    vDisplacement = cnoise(position + vec3(u_noiseSpeed * u_time));
+    // Use u_time and u_noiseSpeed
+    vDisplacement = cnoise(position + vec3(u_time * u_noiseSpeed));
 
     vec3 newPosition = position + normal * (u_intensity * vDisplacement);
 
