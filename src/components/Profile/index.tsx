@@ -13,6 +13,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@components/ui/dropdown-menu';
+import Spotify from '@assets/icons/spotify-2.svg?react';
 
 type Props = {};
 
@@ -69,7 +70,10 @@ const Profile = (props: Props) => {
   return (
     <section id="photos" className="relative">
       <div className="mb-7 flex xs:flex-col lg:flex-row justify-between items-center lg:w-3/4">
-        <h1 className="text-4xl font-bold">My Top Tracks</h1>
+        <div className="mb-7 flex items-center space-x-3">
+          <h1 className="text-4xl font-bold">My Top Tracks</h1>
+          <Spotify className="w-8 h-8 fill-brand-spotify" />
+        </div>
         <div className="flex items-center space-x-4 my-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

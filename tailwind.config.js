@@ -27,6 +27,7 @@ module.exports = {
         brand: {
           lime: '#1db954',
           spotiBlack: '#191414',
+          spotify: '#1ed760',
           dark: '#090F13',
           bg: '#131A21',
           border: '#141B22',

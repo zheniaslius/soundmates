@@ -10,6 +10,7 @@ import SkeletonCard from '@components/UsersList/UserCard/Skeleton';
 import { Skeleton } from '@components/ui/skeleton';
 import useAudioStore from '@store/audioStore';
 import { useMediaQuery } from 'usehooks-ts';
+import Spotify from '@assets/icons/spotify-2.svg?react';
 
 const START_INDEX = 0;
 const DRAG_THRESHOLD = 150;
@@ -208,8 +209,9 @@ export default function UsersList({ data, isLoading }: Props) {
 
   return (
     <div className="min-h-screen overflow-x-hidden">
-      <div className="mb-7">
+      <div className="mb-7 flex items-center space-x-3">
         <h1 className="text-4xl font-bold">Your matches</h1>
+        <Spotify className="w-8 h-8 fill-brand-spotify" />
       </div>
       <div className="group ">
         {/* Cursor Animation: Optional - Hide or adjust based on device */}

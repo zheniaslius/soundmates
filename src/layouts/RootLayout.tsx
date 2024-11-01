@@ -1,6 +1,6 @@
-import { Outlet, useNavigate } from 'react-router-dom';
-import { ClerkProvider, useAuth } from '@clerk/clerk-react';
-import useStore from '@store';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { ClerkProvider } from '@clerk/clerk-react';
+import ReactGA from 'react-ga4';
 import { useEffect } from 'react';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -9,26 +9,17 @@ if (!PUBLISHABLE_KEY) {
   throw new Error('Missing Publishable Key');
 }
 
-const TokenProvider = () => {
-  const { isSignedIn } = useAuth();
-  const { user } = useStore();
-  const navigate = useNavigate();
+const usePageTracking = () => {
+  const location = useLocation();
 
   useEffect(() => {
-    if (isSignedIn && user) {
-      navigate('/');
-      return;
-    }
-    if (isSignedIn) {
-      navigate('/finish-sign-in');
-    }
-  }, [isSignedIn, navigate, user]);
-
-  return null;
+    ReactGA.send({ hitType: 'pageview', page: location.pathname + location.search });
+  }, [location]);
 };
 
 export default function RootLayout() {
   const navigate = useNavigate();
+  usePageTracking();
 
   return (
     <ClerkProvider
@@ -36,7 +27,6 @@ export default function RootLayout() {
       routerReplace={(to) => navigate(to, { replace: true })}
       publishableKey={PUBLISHABLE_KEY}
     >
-      <TokenProvider />
       <Outlet />
     </ClerkProvider>
   );
