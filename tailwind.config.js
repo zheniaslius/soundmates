@@ -17,6 +17,12 @@ module.exports = {
       },
     },
     extend: {
+      screens: {
+        'xs': '320px',
+      },
+      fontFamily: {
+        montserrat: ['Montserrat', 'sans-serif'],
+      },
       colors: {
         brand: {
           lime: '#1db954',

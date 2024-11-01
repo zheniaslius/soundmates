@@ -1,16 +1,22 @@
-import * as React from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import useStore from '@store';
 
 export default function DashboardLayout() {
-  const { userId, isLoaded } = useAuth();
+  const { isSignedIn } = useAuth();
+  const { user } = useStore();
   const navigate = useNavigate();
 
-  React.useEffect(() => {
-    if (isLoaded && !userId) {
-      navigate('/sign-in');
+  useEffect(() => {
+    if (isSignedIn && user) {
+      navigate('/');
+      return;
     }
-  }, [isLoaded, userId, navigate]);
+    if (isSignedIn) {
+      navigate('/finish-sign-in');
+    }
+  }, [isSignedIn, navigate, user]);
 
   return <Outlet />;
 }

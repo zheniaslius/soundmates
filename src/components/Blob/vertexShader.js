@@ -94,8 +94,9 @@ float cnoise(vec3 P) {
 void main() {
     vUv = uv;
 
-    // Use u_time and u_noiseSpeed
-    vDisplacement = cnoise(position + vec3(u_time * u_noiseSpeed));
+    // Modify the noise position to prevent rotation
+    vec3 noisePos = position + normal * u_intensity + vec3(0.0, u_time * u_noiseSpeed, 0.0);
+    vDisplacement = cnoise(noisePos);
 
     vec3 newPosition = position + normal * (u_intensity * vDisplacement);
 

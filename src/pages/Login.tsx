@@ -1,8 +1,9 @@
 import { Button } from '@components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import Spotify from '@assets/spotify-2.svg?react';
-import Sound from '@assets/noun-sound-4888408.svg?react';
+import Spotify from '@assets/icons/spotify-2.svg?react';
+import Sound from '@assets/icons/noun-sound-4888408.svg?react';
 import { SignInButton } from '@clerk/clerk-react';
+import SpotifyLogIn from '@components/ui/buttons/SpotifyLogIn';
 
 const Login = () => {
   return (
@@ -12,12 +13,7 @@ const Login = () => {
         <CardTitle className="text-xl text-brand-gray-100">Login to HarmonyMatch</CardTitle>
       </CardHeader>
       <CardContent className="text-center">
-        <Button className="bg-brand-lime hover:bg-brand-lime hover:brightness-75">
-          <Spotify className="w-5 h-5 fill-brand-spotiBlack" />
-          <span className="text-brand-spotiBlack ml-2">
-            <SignInButton />
-          </span>
-        </Button>
+        <SpotifyLogIn />
       </CardContent>
     </Card>
   );

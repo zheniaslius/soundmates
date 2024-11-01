@@ -12,14 +12,15 @@ const Blob = () => {
   const audioRef = useRef(null);
   const { audioUrl } = useAudioStore();
 
-  const idleSpeedFactor = 0.3;
+  // Adjust the speed factor for the idle animation only
+  const idleSpeedFactor = 0.3; // Lower value slows down the idle animation
 
   const uniforms = useMemo(
     () => ({
       u_time: { value: 0 },
       u_intensity: { value: 0 },
-      u_noiseSpeed: { value: 0.5 },
-      u_distortionSpeed: { value: 0.8 },
+      u_noiseSpeed: { value: 0.5 }, // Default idle value
+      u_distortionSpeed: { value: 0.8 }, // Default idle value
     }),
     []
   );
@@ -29,27 +30,35 @@ const Blob = () => {
     let audio;
 
     const startAudio = async () => {
+      // Create Audio Context
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
+      if (!audioUrl) return;
+
+      // Load Audio
       audio = new Audio(audioUrl);
       audio.crossOrigin = 'anonymous';
       await audio.play();
 
       audioRef.current = audio;
 
+      // Create Media Element Source
       const source = audioContext.createMediaElementSource(audio);
 
+      // Create Analyser Node
       analyser.current = audioContext.createAnalyser();
       analyser.current.fftSize = 256;
       const bufferLength = analyser.current.frequencyBinCount;
       dataArray.current = new Uint8Array(bufferLength);
 
+      // Connect Nodes
       source.connect(analyser.current);
       analyser.current.connect(audioContext.destination);
     };
 
     startAudio();
 
+    // Cleanup Function
     return () => {
       if (audio) {
         audio.pause();
@@ -62,63 +71,57 @@ const Blob = () => {
     };
   }, [audioUrl]);
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     const { clock } = state;
     if (mesh.current) {
-      const elapsedTime = clock.getElapsedTime();
+      // Update Time Uniform with actual elapsed time for responsiveness
+      mesh.current.material.uniforms.u_time.value = clock.getElapsedTime();
 
-      mesh.current.material.uniforms.u_time.value = elapsedTime;
-
-      let targetNoiseSpeed, targetDistortionSpeed;
-
-      if (analyser.current && dataArray.current && audioRef.current && !audioRef.current.paused) {
-        targetNoiseSpeed = 1.0;
-        targetDistortionSpeed = 1.0;
-
+      if (
+        analyser.current &&
+        dataArray.current &&
+        audioRef.current &&
+        !audioRef.current.paused // Check if audio is playing
+      ) {
         analyser.current.getByteFrequencyData(dataArray.current);
 
+        // Calculate Average Frequency
         const avgFrequency =
           dataArray.current.reduce((sum, value) => sum + value, 0) / dataArray.current.length;
 
+        // Normalize Intensity
         const intensity = MathUtils.clamp(avgFrequency / 128, 0, 1);
 
+        // Smooth the intensity changes
         mesh.current.material.uniforms.u_intensity.value = MathUtils.lerp(
           mesh.current.material.uniforms.u_intensity.value,
           intensity,
-          0.1
+          0.1 // Adjust smoothing factor as needed
         );
+
+        // Set speed factors for active music playback (matching old behavior)
+        mesh.current.material.uniforms.u_noiseSpeed.value = 1.0;
+        mesh.current.material.uniforms.u_distortionSpeed.value = 1.0;
       } else {
-        targetNoiseSpeed = 0.5;
-        targetDistortionSpeed = 0.8;
-
-        const idleTime = elapsedTime * idleSpeedFactor;
+        // Slowed down Idle Animation
+        const idleTime = clock.getElapsedTime() * idleSpeedFactor;
         const idleIntensity = 0.3 + 0.2 * Math.sin(idleTime * 0.2);
-
         mesh.current.material.uniforms.u_intensity.value = MathUtils.lerp(
           mesh.current.material.uniforms.u_intensity.value,
           idleIntensity,
-          0.05
+          0.05 // Lower smoothing factor for smoother transitions
         );
+
+        // Set speed factors for idle state
+        mesh.current.material.uniforms.u_noiseSpeed.value = 0.5;
+        mesh.current.material.uniforms.u_distortionSpeed.value = 0.8;
       }
-
-      const smoothingFactor = 0.1;
-
-      mesh.current.material.uniforms.u_noiseSpeed.value = MathUtils.lerp(
-        mesh.current.material.uniforms.u_noiseSpeed.value,
-        targetNoiseSpeed,
-        smoothingFactor
-      );
-
-      mesh.current.material.uniforms.u_distortionSpeed.value = MathUtils.lerp(
-        mesh.current.material.uniforms.u_distortionSpeed.value,
-        targetDistortionSpeed,
-        smoothingFactor
-      );
     }
   });
 
   return (
     <mesh ref={mesh} scale={1.5} position={[0, 0, 0]}>
+      {/* Increased subdivisions for smoother edges */}
       <icosahedronGeometry args={[2, 50]} />
       <shaderMaterial vertexShader={vertexShader} fragmentShader={fragmentShader} uniforms={uniforms} />
     </mesh>

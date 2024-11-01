@@ -7,7 +7,6 @@ import RootLayout from './layouts/RootLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import HomePage from '@pages/Home';
 import LoginPage from '@pages/Login';
-import FinishSignIn from '@pages/FinishSignIn';
 import { ThemeProvider } from '@components/theme-provider';
 import { Toaster } from '@components/ui/toaster';
 
@@ -15,17 +14,16 @@ const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      { path: '/', element: <LoginPage /> },
-      { path: '/sign-in/*', element: <LoginPage /> },
       {
-        element: <DashboardLayout />,
         path: '/',
-        children: [{ path: '/dashboard', element: <HomePage /> }],
-      },
-      {
         element: <DashboardLayout />,
-        path: '/finish-sign-in',
-        children: [{ path: '/finish-sign-in', element: <FinishSignIn /> }],
+        children: [
+          { path: '/', element: <HomePage /> },
+          {
+            path: '/finish-sign-in',
+            element: <HomePage />,
+          },
+        ],
       },
     ],
   },

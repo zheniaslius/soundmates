@@ -3,10 +3,13 @@ import { useAuth } from '@clerk/clerk-react';
 import { api } from '@api';
 import useSWRMutation from 'swr/mutation';
 
-export function useClerkMutation(url: string, method: 'get' | 'post' | 'put' | 'delete' | 'patch' = 'post') {
+export function useClerkMutation(
+  url: string | null,
+  method: 'get' | 'post' | 'put' | 'delete' | 'patch' = 'post'
+) {
   const { getToken } = useAuth();
 
-  const fetcher = async (url, { arg }) => {
+  const fetcher = async (url: string | null, { arg }) => {
     const token = await getToken();
     const headers = { Authorization: `Bearer ${token}` };
 

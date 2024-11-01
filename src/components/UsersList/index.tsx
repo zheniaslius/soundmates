@@ -1,4 +1,4 @@
-import { MouseEvent as ReactMouseEvent, useRef, useState } from 'react';
+import { MouseEvent as ReactMouseEvent, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useSpring, type PanInfo } from 'framer-motion';
 import { MoveLeft, MoveRight } from 'lucide-react';
@@ -6,7 +6,8 @@ import { Play, Pause } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import UserCard from '@components/UsersList/UserCard';
-import Skeleton from '@components/UsersList/UserCard/Skeleton';
+import SkeletonCard from '@components/UsersList/UserCard/Skeleton';
+import { Skeleton } from '@components/ui/skeleton';
 import useAudioStore from '@store/audioStore';
 
 const START_INDEX = 0;
@@ -18,7 +19,6 @@ const CURSOR_SIZE = 60;
 export default function UsersList({ data, isLoading }) {
   const { audioUrl } = useAudioStore();
   const containerRef = useRef<HTMLUListElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const itemsRef = useRef<(HTMLLIElement | null)[]>([]);
   const [activeSlide, setActiveSlide] = useState(START_INDEX);
   const canScrollPrev = activeSlide > 0;
@@ -146,6 +146,10 @@ export default function UsersList({ data, isLoading }) {
     mass: 0.1,
   });
 
+  useEffect(() => {
+    audioUrl ? setHoverType('pause') : setHoverType('play');
+  }, [audioUrl]);
+
   function navButtonHover({
     currentTarget,
     clientX,
@@ -192,14 +196,14 @@ export default function UsersList({ data, isLoading }) {
   if (!data?.length && !isLoading) return null;
 
   return (
-    <div className="min-h-screen overflow-x-hidden container mt-24">
-      <div className="mb-9">
+    <div className="min-h-screen overflow-x-hidden">
+      <div className="mb-7">
         <h1 className="text-4xl font-bold">Your matches</h1>
       </div>
       <div className="group ">
         <motion.div
           className={cn(
-            'pointer-events-none absolute z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100'
+            'lg:block hidden pointer-events-none absolute z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100'
           )}
           style={{
             width: CURSOR_SIZE,
@@ -255,27 +259,29 @@ export default function UsersList({ data, isLoading }) {
           >
             {(isLoading ? Array.from(new Array(5)) : data).map((user, index) => {
               const active = index === activeSlide;
+
               return (
                 <motion.li
                   layout="position"
                   key={user?._id?._id}
                   ref={(el) => (itemsRef.current[index] = el)}
                   className={cn(
-                    'group relative shrink-0 select-none transition-opacity duration-300',
-                    !active && 'opacity-90 blur-sm pointer-events-none'
+                    'group relative shrink-0 select-none transition-opacity duration-300 lg:basis-[680px] w-full',
+                    !active && 'blur-sm pointer-events-none'
                   )}
                   transition={{
                     ease: 'easeInOut',
                     duration: 0.4,
                   }}
-                  style={{
-                    flexBasis: 680,
-                  }}
                 >
                   <div className="block" draggable={false} onClick={disableDragClick}>
-                    <div className={cn('grid overflow-hidden rounded-lg bg-brand-bg')}>
+                    <div
+                      className={cn(
+                        'grid overflow-hidden rounded-lg bg-brand-bg bg-opacity-70 backdrop-blur-md'
+                      )}
+                    >
                       {isLoading ? (
-                        <Skeleton />
+                        <SkeletonCard />
                       ) : (
                         <UserCard
                           data={user}
@@ -301,7 +307,11 @@ export default function UsersList({ data, isLoading }) {
                   </div>
                   <div className={cn('mt-4 flex justify-center', !active && 'hidden')}>
                     {isLoading ? (
-                      <div className="rounded-full bg-slate-300 h-6 w-40 animate-pulse"></div>
+                      <Skeleton className="rounded-full  h-6 w-40" />
+                    ) : !user?._id?.spotifyUri ? (
+                      <span className="text-xl font-bold leading-tight transition-colors group-hover:text-lime-300">
+                        {user?._id?.displayName}
+                      </span>
                     ) : (
                       <Link
                         to={user?._id?.spotifyUri}

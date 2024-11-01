@@ -16,7 +16,7 @@ const TokenProvider = () => {
 
   useEffect(() => {
     if (isSignedIn && user) {
-      navigate('/dashboard');
+      navigate('/');
       return;
     }
     if (isSignedIn) {

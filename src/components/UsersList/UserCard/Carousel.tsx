@@ -19,20 +19,20 @@ const MusicCarousel = ({ data, onClick, mouseEvents, getImgSrc, classNames }: Pr
         align: 'start',
         watchDrag: false,
       }}
-      className="max-w-72"
+      className="lg:max-w-72 max-w-[12rem] ml-9 lg:ml-0"
     >
       <CarouselContent>
         {data?.map((artist) => (
           <CarouselItem
             key={artist.id}
-            className="lg:basis-1/2"
+            className="basis-1/2"
             onClick={() => onClick(artist)}
             onMouseEnter={mouseEvents.play.onMouseEnter}
             onMouseLeave={mouseEvents.play.onMouseLeave}
             onMouseMove={() => mouseEvents.play.onMouseMove(artist)}
           >
             <img src={getImgSrc(artist)} className={'w-full aspect-square object-cover mb-1.5'} />
-            <span className="text-base">{artist.name}</span>
+            <span className="text-sm">{artist.name}</span>
           </CarouselItem>
         ))}
       </CarouselContent>
