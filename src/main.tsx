@@ -6,7 +6,6 @@ import './globals.css';
 import RootLayout from './layouts/RootLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import HomePage from '@pages/Home';
-import LoginPage from '@pages/Login';
 import { ThemeProvider } from '@components/theme-provider';
 import { Toaster } from '@components/ui/toaster';
 

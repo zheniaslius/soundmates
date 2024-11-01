@@ -9,6 +9,7 @@ import UserCard from '@components/UsersList/UserCard';
 import SkeletonCard from '@components/UsersList/UserCard/Skeleton';
 import { Skeleton } from '@components/ui/skeleton';
 import useAudioStore from '@store/audioStore';
+import { useMediaQuery } from 'usehooks-ts';
 
 const START_INDEX = 0;
 const DRAG_THRESHOLD = 150;
@@ -16,7 +17,14 @@ const FALLBACK_WIDTH = 509;
 
 const CURSOR_SIZE = 60;
 
-export default function UsersList({ data, isLoading }) {
+interface Props {
+  data: unknown[];
+  isLoading: boolean;
+}
+
+export default function UsersList({ data, isLoading }: Props) {
+  // Corrected media query for mobile
+  const isMobile = useMediaQuery('(max-width: 1023px)');
   const { audioUrl } = useAudioStore();
   const containerRef = useRef<HTMLUListElement>(null);
   const itemsRef = useRef<(HTMLLIElement | null)[]>([]);
@@ -30,17 +38,18 @@ export default function UsersList({ data, isLoading }) {
   });
 
   const [isDragging, setIsDragging] = useState(false);
+
   function handleDragSnap(_: MouseEvent, { offset: { x: dragOffset } }: PanInfo) {
-    //reset drag state
+    // Reset drag state
     setIsDragging(false);
     containerRef.current?.removeAttribute('data-dragging');
 
-    //stop drag animation (rest velocity)
+    // Stop drag animation (rest velocity)
     animatedX.stop();
 
     const currentOffset = offsetX.get();
 
-    //snap back if not dragged far enough or if at the start/end of the list
+    // Snap back if not dragged far enough or if at the start/end of the list
     if (
       Math.abs(dragOffset) < DRAG_THRESHOLD ||
       (!canScrollPrev && dragOffset > 0) ||
@@ -52,10 +61,10 @@ export default function UsersList({ data, isLoading }) {
 
     let offsetWidth = 0;
     /*
-      - start searching from currently active slide in the direction of the drag
-      - check if the drag offset is greater than the width of the current item
-      - if it is, add/subtract the width of the next/prev item to the offsetWidth
-      - if it isn't, snap to the next/prev item
+      - Start searching from currently active slide in the direction of the drag
+      - Check if the drag offset is greater than the width of the current item
+      - If it is, add/subtract the width of the next/prev item to the offsetWidth
+      - If it isn't, snap to the next/prev item
     */
     for (
       let i = activeSlide;
@@ -70,23 +79,23 @@ export default function UsersList({ data, isLoading }) {
       const nextItemWidth = itemsRef.current[i + 1]?.offsetWidth ?? FALLBACK_WIDTH;
 
       if (
-        (dragOffset > 0 && //dragging left
-          dragOffset > offsetWidth + itemOffset && //dragged past item
-          i > 1) || //not the first/second item
-        (dragOffset < 0 && //dragging right
-          dragOffset < offsetWidth + -itemOffset && //dragged past item
-          i < itemsRef.current.length - 2) //not the last/second to last item
+        (dragOffset > 0 && // dragging left
+          dragOffset > offsetWidth + itemOffset && // dragged past item
+          i > 1) || // not the first/second item
+        (dragOffset < 0 && // dragging right
+          dragOffset < offsetWidth + -itemOffset && // dragged past item
+          i < itemsRef.current.length - 2) // not the last/second to last item
       ) {
         dragOffset > 0 ? (offsetWidth += prevItemWidth) : (offsetWidth -= nextItemWidth);
         continue;
       }
 
       if (dragOffset > 0) {
-        //prev
+        // Previous
         offsetX.set(currentOffset + offsetWidth + prevItemWidth);
         setActiveSlide(i - 1);
       } else {
-        //next
+        // Next
         offsetX.set(currentOffset + offsetWidth - nextItemWidth);
         setActiveSlide(i + 1);
       }
@@ -132,7 +141,9 @@ export default function UsersList({ data, isLoading }) {
     setActiveSlide(newActiveSlide);
   }
 
-  const [hoverType, setHoverType] = useState<'prev' | 'next' | 'click' | null>(null);
+  const [hoverType, setHoverType] = useState<'prev' | 'next' | 'click' | 'play' | 'pause' | 'none' | null>(
+    null
+  );
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const animatedHoverX = useSpring(mouseX, {
@@ -201,37 +212,40 @@ export default function UsersList({ data, isLoading }) {
         <h1 className="text-4xl font-bold">Your matches</h1>
       </div>
       <div className="group ">
-        <motion.div
-          className={cn(
-            'lg:block hidden pointer-events-none absolute z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100'
-          )}
-          style={{
-            width: CURSOR_SIZE,
-            height: CURSOR_SIZE,
-            x: animatedHoverX,
-            y: animatedHoverY,
-          }}
-        >
+        {/* Cursor Animation: Optional - Hide or adjust based on device */}
+        {!isMobile && (
           <motion.div
-            layout
             className={cn(
-              'grid h-full place-items-center rounded-full bg-lime-300',
-              hoverType === 'click' && 'absolute inset-5 h-auto',
-              hoverType === 'none' && 'bg-transparent'
+              'pointer-events-none absolute z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100'
             )}
+            style={{
+              width: CURSOR_SIZE,
+              height: CURSOR_SIZE,
+              x: animatedHoverX,
+              y: animatedHoverY,
+            }}
           >
-            <motion.span
-              layout="position"
+            <motion.div
+              layout
               className={cn(
-                'w-full select-none text-center font-medium uppercase text-gray-900',
-                (hoverType === 'prev' || hoverType === 'next') && 'absolute inset-x-0 top-2',
-                hoverType === 'click' && 'absolute top-full mt-0.5 w-auto text-sm font-bold text-lime-300'
+                'grid h-full place-items-center rounded-full bg-lime-300',
+                hoverType === 'click' && 'absolute inset-5 h-auto',
+                hoverType === 'none' && 'bg-transparent'
               )}
             >
-              {getCursorText()}
-            </motion.span>
+              <motion.span
+                layout="position"
+                className={cn(
+                  'w-full select-none text-center font-medium uppercase text-gray-900',
+                  (hoverType === 'prev' || hoverType === 'next') && 'absolute inset-x-0 top-2',
+                  hoverType === 'click' && 'absolute top-full mt-0.5 w-auto text-sm font-bold text-lime-300'
+                )}
+              >
+                {getCursorText()}
+              </motion.span>
+            </motion.div>
           </motion.div>
-        </motion.div>
+        )}
         <div className="relative">
           <motion.ul
             ref={containerRef}
@@ -239,23 +253,27 @@ export default function UsersList({ data, isLoading }) {
             style={{
               x: animatedX,
             }}
-            drag="x"
-            dragConstraints={{
-              left: -(FALLBACK_WIDTH * (data?.length - 1)),
-              right: FALLBACK_WIDTH,
-            }}
+            // Apply drag only if not on mobile
+            {...(!isMobile && {
+              drag: 'x',
+              dragConstraints: {
+                left: -(FALLBACK_WIDTH * (data?.length - 1)),
+                right: FALLBACK_WIDTH,
+              },
+              onDragStart: () => {
+                containerRef.current?.setAttribute('data-dragging', 'true');
+                setIsDragging(true);
+              },
+              onDragEnd: handleDragSnap,
+            })}
             onMouseMove={({ currentTarget, clientX, clientY }) => {
+              if (isMobile) return; // Skip mouse move on mobile
               const parent = currentTarget.offsetParent;
               if (!parent) return;
               const { left, top } = parent.getBoundingClientRect();
               mouseX.set(clientX - left - CURSOR_SIZE / 2);
               mouseY.set(clientY - top - CURSOR_SIZE / 2);
             }}
-            onDragStart={() => {
-              containerRef.current?.setAttribute('data-dragging', 'true');
-              setIsDragging(true);
-            }}
-            onDragEnd={handleDragSnap}
           >
             {(isLoading ? Array.from(new Array(5)) : data).map((user, index) => {
               const active = index === activeSlide;
@@ -263,7 +281,7 @@ export default function UsersList({ data, isLoading }) {
               return (
                 <motion.li
                   layout="position"
-                  key={user?._id?._id}
+                  key={user?._id?._id || index} // Fallback key
                   ref={(el) => (itemsRef.current[index] = el)}
                   className={cn(
                     'group relative shrink-0 select-none transition-opacity duration-300 lg:basis-[680px] w-full',
@@ -331,10 +349,11 @@ export default function UsersList({ data, isLoading }) {
               );
             })}
           </motion.ul>
+          {/* Navigation Buttons: Kept visible on all devices */}
           {canScrollPrev && (
             <button
               type="button"
-              className="group absolute left-[10%] top-1/3 z-20 grid aspect-square place-content-center rounded-full transition-colors"
+              className="group lg:absolute fixed left-[10%] top-1/3 z-20 grid aspect-square place-content-center rounded-full transition-colors"
               style={{
                 width: CURSOR_SIZE,
                 height: CURSOR_SIZE,
@@ -349,22 +368,24 @@ export default function UsersList({ data, isLoading }) {
               <MoveLeft className="h-10 w-10 stroke-[1.5] transition-colors group-enabled:group-hover:text-gray-900 group-disabled:opacity-50" />
             </button>
           )}
-          <button
-            type="button"
-            className="group absolute right-[10%] top-1/3 z-20 grid aspect-square place-content-center rounded-full transition-colors"
-            style={{
-              width: CURSOR_SIZE,
-              height: CURSOR_SIZE,
-            }}
-            onClick={scrollNext}
-            disabled={!canScrollNext}
-            onMouseEnter={() => setHoverType('next')}
-            onMouseMove={(e) => navButtonHover(e)}
-            onMouseLeave={() => setHoverType(null)}
-          >
-            <span className="sr-only">Next Guide</span>
-            <MoveRight className="h-10 w-10 stroke-[1.5] transition-colors group-enabled:group-hover:text-gray-900 group-disabled:opacity-50" />
-          </button>
+          {canScrollNext && (
+            <button
+              type="button"
+              className="group lg:absolute fixed right-[10%] top-1/3 z-20 grid aspect-square place-content-center rounded-full transition-colors"
+              style={{
+                width: CURSOR_SIZE,
+                height: CURSOR_SIZE,
+              }}
+              onClick={scrollNext}
+              disabled={!canScrollNext}
+              onMouseEnter={() => setHoverType('next')}
+              onMouseMove={(e) => navButtonHover(e)}
+              onMouseLeave={() => setHoverType(null)}
+            >
+              <span className="sr-only">Next Guide</span>
+              <MoveRight className="h-10 w-10 stroke-[1.5] transition-colors group-enabled:group-hover:text-gray-900 group-disabled:opacity-50" />
+            </button>
+          )}
         </div>
       </div>
     </div>

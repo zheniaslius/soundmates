@@ -1,10 +1,8 @@
 import { Skeleton } from '@components/ui/skeleton';
 
-type Props = {};
-
 const skeletonArray = Array.from({ length: 20 });
 
-const Loader = (props: Props) => {
+const Loader = () => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-10 lg:w-3/4">
       {skeletonArray.map((_, idx) => (

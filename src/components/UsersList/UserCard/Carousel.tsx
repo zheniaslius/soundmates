@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Carousel,
   CarouselContent,
@@ -6,13 +5,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@components/ui/carousel';
-import { cn } from '@/lib/utils';
 
 type Props = {
   data: unknown[];
 };
 
-const MusicCarousel = ({ data, onClick, mouseEvents, getImgSrc, classNames }: Props) => {
+const MusicCarousel = ({ data, onClick, mouseEvents, getImgSrc }: Props) => {
   return (
     <Carousel
       opts={{

@@ -8,10 +8,10 @@ import useAudioStore from '@store/audioStore';
 import AlertLinkDialog from './AlertLinkDialog';
 import { AlertDialog, AlertDialogTrigger } from '@components/ui/alert-dialog';
 
-const UserCard = ({ data, mouseEvents, playAudio }) => {
+const UserCard = ({ data, mouseEvents }) => {
   const [artistId, setArtistId] = useState<string>();
   const [trackId, setTrackId] = useState<string>();
-  const { audioUrl, setAudioUrl } = useAudioStore();
+  const { setAudioUrl } = useAudioStore();
   const user = data?._id;
   const photo = user?.images?.find((i) => i.url?.includes('height=300'));
   const { trigger } = useClerkMutation(artistId ? `/artists/${artistId}/top-tracks` : null, 'get');
@@ -55,12 +55,16 @@ const UserCard = ({ data, mouseEvents, playAudio }) => {
   return (
     <>
       <div className="flex flex-col lg:flex-row justify-items-center min-h-[455px]">
-        <div className="relative lg:basis-1/2 pointer-events-none">
+        <div className="relative basis-1/2 pointer-events-none">
           <div className="img">
-            <img src={photo?.url} className="relative z-0 h-60 w-60 lg:h-full lg:w-full object-cover" />
+            {photo?.url ? (
+              <img src={photo?.url} className="relative z-0 h-60 w-full lg:h-full lg:w-full object-cover" />
+            ) : (
+              <div className="relative z-0 h-60 w-full lg:h-full lg:w-full object-cover" />
+            )}
           </div>
           {!!matchingScore && (
-            <div className="pl-4 lg:pl-0 absolute bottom-4 lg:bottom-8 w-full flex items-center lg:justify-center sm:lg:justify-start">
+            <div className="pl-4  lg:pl-0 absolute bottom-0 lg:bottom-8 w-full flex items-center lg:justify-center sm:lg:justify-start">
               <span
                 className={`flex items-center text-sm lg:text-base font-bold ${scoreColor} backdrop-blur-md bg-gray-800 bg-opacity-60 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full shadow-xl`}
               >

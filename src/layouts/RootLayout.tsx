@@ -1,5 +1,5 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { ClerkProvider, SignedIn, SignedOut, useAuth, UserButton } from '@clerk/clerk-react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { ClerkProvider, useAuth } from '@clerk/clerk-react';
 import useStore from '@store';
 import { useEffect } from 'react';
 

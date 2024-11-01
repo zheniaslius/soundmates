@@ -101,9 +101,18 @@
     height: 100%;
   }
 
-  .img img {
-    -webkit-mask-image: linear-gradient(to right, black, transparent);
-    mask-image: linear-gradient(to right, black, transparent);
+  @media (min-width: 320px) {
+    .img img {
+      -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+      mask-image: linear-gradient(to bottom, black, transparent);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .img img {
+      -webkit-mask-image: linear-gradient(to right, black, transparent);
+      mask-image: linear-gradient(to right, black, transparent);
+    }
   }
 
   .shadow-bottom {

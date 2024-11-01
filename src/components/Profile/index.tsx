@@ -1,11 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import BlurFade from '@components/ui/blur-fade';
 import { useClerkMutation } from '@api/useClerkSWR';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { PlayIcon, PauseIcon } from '@heroicons/react/24/outline';
 import Loader from './Loader';
 import useAudioStore from '@store/audioStore';
-import { Slider } from '@components/ui/slider';
+import { Button } from '@components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from '@components/ui/dropdown-menu';
 
 type Props = {};
 
@@ -52,17 +59,8 @@ const Profile = (props: Props) => {
     }
   };
 
-  const handleSliderChange = (value: number[]) => {
-    const selectedValue = value[0];
-    let timeRangeValue = 'medium_term';
-    if (selectedValue === 1) {
-      timeRangeValue = 'long_term';
-    } else if (selectedValue === 2) {
-      timeRangeValue = 'medium_term';
-    } else if (selectedValue === 3) {
-      timeRangeValue = 'short_term';
-    }
-    setTimeRange(timeRangeValue);
+  const handleTimeChange = (value: string) => {
+    setTimeRange(value);
     setTracks([]);
     setOffset(0);
     setHasMore(true);
@@ -70,19 +68,21 @@ const Profile = (props: Props) => {
 
   return (
     <section id="photos" className="relative">
-      <div className="mb-7 flex xs:flex-col lg:flex-row justify-between items-center w-3/4">
+      <div className="mb-7 flex xs:flex-col lg:flex-row justify-between items-center lg:w-3/4">
         <h1 className="text-4xl font-bold">My Top Tracks</h1>
         <div className="flex items-center space-x-4 my-4">
-          <span className="text-sm">Older</span>
-          <Slider
-            defaultValue={[2]}
-            max={3}
-            min={1}
-            step={1}
-            className="w-32"
-            onValueChange={handleSliderChange}
-          />
-          <span className="text-sm">Newer</span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">Term</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48">
+              <DropdownMenuRadioGroup value={timeRange} onValueChange={handleTimeChange}>
+                <DropdownMenuRadioItem value="short_term">Short</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="medium_term">Medium</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="long_term">Long</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <InfiniteScroll

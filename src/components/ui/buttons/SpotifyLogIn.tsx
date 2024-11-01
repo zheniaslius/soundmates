@@ -1,10 +1,10 @@
 import { Button } from '@components/ui/button';
 import { SignInButton } from '@clerk/clerk-react';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-expect-error
 import Spotify from '@assets/icons/spotify-2.svg?react';
 
-type Props = {};
-
-const SpotifyLogIn = (props: Props) => {
+const SpotifyLogIn = () => {
   return (
     <SignInButton>
       <Button className="bg-brand-lime hover:bg-brand-lime hover:brightness-75 transition-all">

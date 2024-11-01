@@ -8,23 +8,19 @@ import UpdateProfileSheet from '@components/UpdateProfileSheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs';
 import { useEffect, useState } from 'react';
 import Profile from '@components/Profile';
-import { useAuth, SignIn } from '@clerk/clerk-react';
+import { useAuth } from '@clerk/clerk-react';
 import { useLocation } from 'react-router-dom';
 import SpotifyLogIn from '@components/ui/buttons/SpotifyLogIn';
 import FinishSignIn from '@components/modals/FinishSignIn';
 import {
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
   AlertDialog,
 } from '@components/ui/alert-dialog';
-
-type Props = {};
 
 const PreventClick = ({ isPrevent, children, onClick }) => {
   return isPrevent ? (
@@ -36,7 +32,7 @@ const PreventClick = ({ isPrevent, children, onClick }) => {
   );
 };
 
-const Home = (props: Props) => {
+const Home = () => {
   const location = useLocation();
   const { isSignedIn } = useAuth();
   const [showModal, setShowModal] = useState(false);
@@ -94,7 +90,9 @@ const Home = (props: Props) => {
           <AlertDialogContent className="min-h-52">
             <AlertDialogHeader>
               <AlertDialogTitle>Please sign in</AlertDialogTitle>
-              <AlertDialogDescription>To use soundmates you need to sign in</AlertDialogDescription>
+              <AlertDialogDescription>
+                To use soundmates you need to connect your spotify account
+              </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => setShowModal(false)}>Cancel</AlertDialogCancel>
