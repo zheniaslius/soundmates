@@ -13,7 +13,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@components/ui/dropdown-menu';
-import Spotify from '@assets/icons/spotify-2.svg?react';
+import Spotify from '@assets/icons/Primary_Logo_Green_RGB.svg?react';
 
 type Props = {};
 
@@ -72,7 +72,6 @@ const Profile = (props: Props) => {
       <div className="mb-7 flex xs:flex-col lg:flex-row justify-between items-center lg:w-3/4">
         <div className="mb-7 flex items-center space-x-3">
           <h1 className="text-4xl font-bold">My Top Tracks</h1>
-          <Spotify className="w-8 h-8 fill-brand-spotify" />
         </div>
         <div className="flex items-center space-x-4 my-4">
           <DropdownMenu>
@@ -111,17 +110,15 @@ const Profile = (props: Props) => {
                     <button
                       onClick={() => handlePlayPause(track.preview_url)}
                       className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                    >
-                      {audioUrl === track.preview_url ? (
-                        <PauseIcon className="w-10" />
-                      ) : (
-                        <PlayIcon className="w-10" />
-                      )}
-                    </button>
+                    />
                   )}
                 </div>
-
-                <p className="mt-2 text-center">{track.name}</p>
+                <div className="mt-2 flex justify-start items-center space-x-2">
+                  <a href={track.uri}>
+                    <Spotify className="w-6 h-6 fill-brand-spotify cursor-pointer hover:brightness-90" />
+                  </a>
+                  <p className="text-center ">{track.name}</p>
+                </div>
               </div>
             </BlurFade>
           ))}

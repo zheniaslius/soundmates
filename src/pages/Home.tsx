@@ -36,7 +36,7 @@ const Home = () => {
   const location = useLocation();
   const { isSignedIn } = useAuth();
   const [showModal, setShowModal] = useState(false);
-  const getUsersUrl = typeof isSignedIn === 'boolean' ? (isSignedIn ? '/users' : '/users/preview') : null;
+  const getUsersUrl = typeof isSignedIn === 'boolean' ? (false ? '/users' : '/users/preview') : null;
   const { data, error, isMutating: isLoading, trigger } = useClerkMutation(getUsersUrl, 'get');
 
   const matches = data?.data?.matches?.matches;

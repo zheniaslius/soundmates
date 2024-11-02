@@ -6,7 +6,7 @@ import { SheetTrigger } from '@components/ui/sheet';
 import { Button } from '@components/ui/button';
 import { useAuth, useUser } from '@clerk/clerk-react';
 import SpotifyLogIn from '@components/ui/buttons/SpotifyLogIn';
-import { Avatar, AvatarFallback, AvatarImage } from '@components/ui/avatar';
+import { Avatar, AvatarImage } from '@components/ui/avatar';
 
 const TopBar = () => {
   const { isSignedIn, signOut } = useAuth();
@@ -24,7 +24,6 @@ const TopBar = () => {
           <SheetTrigger asChild>
             <Avatar className="h-8 w-8 object-contain cursor-pointer hover:brightness-90 transition-all">
               <AvatarImage src={user?.imageUrl} />
-              <AvatarFallback>{user?.fullName}</AvatarFallback>
             </Avatar>
           </SheetTrigger>
           <Button variant={'ghost'} onClick={() => signOut()}>

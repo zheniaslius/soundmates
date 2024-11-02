@@ -5,6 +5,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@components/ui/carousel';
+import Spotify from '@assets/icons/Primary_Logo_Green_RGB.svg?react';
 
 type Props = {
   data: unknown[];
@@ -21,31 +22,24 @@ const MusicCarousel = ({ data, onClick, mouseEvents, getImgSrc }: Props) => {
     >
       <CarouselContent>
         {data?.map((artist) => (
-          <CarouselItem
-            key={artist.id}
-            className="basis-1/2"
-            onClick={() => onClick(artist)}
-            onMouseEnter={mouseEvents.play.onMouseEnter}
-            onMouseLeave={mouseEvents.play.onMouseLeave}
-            onMouseMove={() => mouseEvents.play.onMouseMove(artist)}
-          >
-            <img src={getImgSrc(artist)} className={'w-full aspect-square object-cover mb-1.5'} />
-            <span className="text-sm">{artist.name}</span>
+          <CarouselItem key={artist.id} className="basis-1/2" onClick={() => onClick(artist)}>
+            <img
+              src={getImgSrc(artist)}
+              {...mouseEvents.play}
+              onMouseMove={() => mouseEvents.play.onMouseMove(artist)}
+              className={'w-full aspect-square object-cover mb-1.5'}
+            />
+            <div className="flex items-center space-x-2">
+              <a href={artist.uri} {...mouseEvents.none}>
+                <Spotify className="w-6 h-6 fill-brand-spotify cursor-pointer hover:brightness-90" />
+              </a>
+              <span className="text-sm">{artist.name}</span>
+            </div>
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious
-        className="top-[35%]"
-        onMouseEnter={mouseEvents.none.onMouseEnter}
-        onMouseLeave={mouseEvents.none.onMouseLeave}
-        onMouseMove={mouseEvents.none.onMouseMove}
-      />
-      <CarouselNext
-        className="top-[35%]"
-        onMouseEnter={mouseEvents.none.onMouseEnter}
-        onMouseLeave={mouseEvents.none.onMouseLeave}
-        onMouseMove={mouseEvents.none.onMouseMove}
-      />
+      <CarouselPrevious className="top-[35%]" {...mouseEvents.none} />
+      <CarouselNext className="top-[35%]" {...mouseEvents.none} />
     </Carousel>
   );
 };
