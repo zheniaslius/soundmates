@@ -38,8 +38,10 @@ const Home = () => {
   const [showModal, setShowModal] = useState(false);
   const getUsersUrl = typeof isSignedIn === 'boolean' ? (isSignedIn ? '/users' : '/users/preview') : null;
   const { data, error, isMutating: isLoading, trigger } = useClerkMutation(getUsersUrl, 'get');
+
   const matches = data?.data?.matches?.matches;
   const users = isLoading ? Array.from({ length: 3 }) : matches;
+  const hasNoMatches = !isLoading && Array.isArray(matches) && matches.length === 0;
 
   const showFinishModal = location.pathname === '/finish-sign-in';
 
@@ -77,7 +79,13 @@ const Home = () => {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="matches" className="lg:pr-[80px]">
-              {!error && <UsersList data={users} isLoading={isLoading} />}
+              {hasNoMatches ? (
+                <div className="mb-7 flex items-center space-x-3">
+                  <h1 className="text-4xl font-bold">No matches yet</h1>
+                </div>
+              ) : (
+                !error && <UsersList data={users} isLoading={isLoading} />
+              )}
             </TabsContent>
             <TabsContent value="profile" className="lg:pr-[80px]">
               <Profile />

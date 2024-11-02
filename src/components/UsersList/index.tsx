@@ -277,7 +277,7 @@ export default function UsersList({ data, isLoading }: Props) {
               mouseY.set(clientY - top - CURSOR_SIZE / 2);
             }}
           >
-            {(isLoading ? Array.from(new Array(5)) : data).map((user, index) => {
+            {data?.map((user, index) => {
               const active = index === activeSlide;
 
               return (

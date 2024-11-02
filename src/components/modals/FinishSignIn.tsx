@@ -72,7 +72,7 @@ const FinishSignIn = ({ open }: Props) => {
               render={({ field }) => (
                 <div className="mb-6">
                   <FormControl>
-                    <Input placeholder="Social url" {...field} className="mx-auto w-3/4" />
+                    <Input placeholder="Social url (optional)" {...field} className="mx-auto w-3/4" />
                   </FormControl>
                   <FormMessage className="mt-2 text-center" /> {/* Message moved below the Input */}
                   <div className="flex justify-center mt-4">
