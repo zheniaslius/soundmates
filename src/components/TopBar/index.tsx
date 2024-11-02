@@ -1,14 +1,16 @@
-import { UserIcon, ArrowLeftStartOnRectangleIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/24/outline';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-expect-error
 import Sound from '@assets/icons/noun-sound-4888408.svg?react';
 import { SheetTrigger } from '@components/ui/sheet';
 import { Button } from '@components/ui/button';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth, useUser } from '@clerk/clerk-react';
 import SpotifyLogIn from '@components/ui/buttons/SpotifyLogIn';
+import { Avatar, AvatarFallback, AvatarImage } from '@components/ui/avatar';
 
 const TopBar = () => {
   const { isSignedIn, signOut } = useAuth();
+  const { user } = useUser();
 
   return (
     <nav className="container mx-auto flex justify-between py-8">
@@ -18,11 +20,12 @@ const TopBar = () => {
       {!isSignedIn ? (
         <SpotifyLogIn />
       ) : (
-        <div className="flex items-center">
+        <div className="flex items-center space-x-3">
           <SheetTrigger asChild>
-            <Button variant={'ghost'}>
-              <UserIcon height={22} />
-            </Button>
+            <Avatar className="h-8 w-8 object-contain cursor-pointer hover:brightness-90 transition-all">
+              <AvatarImage src={user?.imageUrl} />
+              <AvatarFallback>{user?.fullName}</AvatarFallback>
+            </Avatar>
           </SheetTrigger>
           <Button variant={'ghost'} onClick={() => signOut()}>
             <ArrowLeftStartOnRectangleIcon height={22} className="text-red-500" />
