@@ -1,6 +1,6 @@
 import { Skeleton } from '@components/ui/skeleton';
 
-const skeletonArray = Array.from({ length: 9 });
+const skeletonArray = Array.from({ length: 15 });
 
 const Loader = () => {
   return (
