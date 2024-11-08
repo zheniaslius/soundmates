@@ -20,9 +20,24 @@ const router = createBrowserRouter([
         path: '/',
         element: <DashboardLayout />,
         children: [
-          { path: '/', element: <HomePage /> },
           {
-            path: '/finish-sign-in',
+            index: true,
+            element: <HomePage />,
+          },
+          {
+            path: 'matches', // Relative path: '/matches'
+            element: <HomePage />,
+          },
+          {
+            path: 'profile', // Relative path: '/profile'
+            element: <HomePage />,
+          },
+          {
+            path: 'finish-sign-in', // Relative path: '/finish-sign-in'
+            element: <HomePage />,
+          },
+          {
+            path: 'search', // Relative path: '/search'
             element: <HomePage />,
           },
         ],

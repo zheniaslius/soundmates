@@ -1,4 +1,3 @@
-import useSWR from 'swr';
 import { useAuth } from '@clerk/clerk-react';
 import { api } from '@api';
 import useSWRMutation from 'swr/mutation';

@@ -8,8 +8,9 @@ import UpdateProfileSheet from '@components/UpdateProfileSheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs';
 import { useEffect, useState } from 'react';
 import Profile from '@components/Profile';
+import Search from '@components/Search';
 import { useAuth } from '@clerk/clerk-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import SpotifyLogIn from '@components/ui/buttons/SpotifyLogIn';
 import FinishSignIn from '@components/modals/FinishSignIn';
 import {
@@ -33,6 +34,7 @@ const PreventClick = ({ isPrevent, children, onClick }) => {
 };
 
 const Home = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { isSignedIn } = useAuth();
   const [showModal, setShowModal] = useState(false);
@@ -41,13 +43,30 @@ const Home = () => {
 
   const matches = data?.data?.matches?.matches;
   const users = isLoading ? Array.from({ length: 3 }) : matches;
+
   const hasNoMatches = !isLoading && Array.isArray(matches) && matches.length === 0;
 
   const showFinishModal = location.pathname === '/finish-sign-in';
+  const validTabs: { [key: string]: string } = {
+    matches: '/matches',
+    profile: '/profile',
+    search: '/search',
+  };
+
+  // Extract the current tab from the URL path
+  const currentPath = location.pathname.toLowerCase();
+  const currentTab = Object.keys(validTabs).find((tab) => validTabs[tab] === currentPath) || 'matches';
 
   useEffect(() => {
     trigger();
   }, [trigger, isSignedIn]);
+
+  const handleTabChange = (value: string) => {
+    const path = validTabs[value];
+    if (path) {
+      navigate(path);
+    }
+  };
 
   return (
     <div className="relative">
@@ -68,14 +87,17 @@ const Home = () => {
 
       <Sheet>
         <TopBar />
-        <PreventClick isPrevent={!isSignedIn} onClick={() => setShowModal(true)}>
-          <Tabs defaultValue="matches">
+        <PreventClick isPrevent={false} onClick={() => setShowModal(true)}>
+          <Tabs defaultValue={currentTab} onValueChange={handleTabChange}>
             <TabsList className="mb-4 h-11">
               <TabsTrigger value="matches" className="text-lg">
                 Matches
               </TabsTrigger>
               <TabsTrigger value="profile" className="text-lg">
                 My profile
+              </TabsTrigger>
+              <TabsTrigger value="search" className="text-lg">
+                Music search
               </TabsTrigger>
             </TabsList>
             <TabsContent value="matches" className="lg:pr-[80px]">
@@ -89,6 +111,9 @@ const Home = () => {
             </TabsContent>
             <TabsContent value="profile" className="lg:pr-[80px]">
               <Profile />
+            </TabsContent>
+            <TabsContent value="search" className="lg:pr-[80px]">
+              <Search />
             </TabsContent>
           </Tabs>
         </PreventClick>

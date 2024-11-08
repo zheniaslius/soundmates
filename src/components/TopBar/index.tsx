@@ -7,19 +7,21 @@ import { Button } from '@components/ui/button';
 import { useAuth, useUser } from '@clerk/clerk-react';
 import SpotifyLogIn from '@components/ui/buttons/SpotifyLogIn';
 import { Avatar, AvatarImage } from '@components/ui/avatar';
+import { useLocation } from 'react-router-dom';
 
 const TopBar = () => {
   const { isSignedIn, signOut } = useAuth();
   const { user } = useUser();
+  const location = useLocation();
+  const showSpotifySignin = location.pathname !== '/search';
 
   return (
     <nav className="container mx-auto flex justify-between py-8">
       <a href="/">
         <Sound className="h-12 fill-brand-lime " />
       </a>
-      {!isSignedIn ? (
-        <SpotifyLogIn />
-      ) : (
+      {!isSignedIn && showSpotifySignin ? <SpotifyLogIn /> : null}
+      {isSignedIn && (
         <div className="flex items-center space-x-3">
           <SheetTrigger asChild>
             <Avatar className="h-8 w-8 object-contain cursor-pointer hover:brightness-90 transition-all">
