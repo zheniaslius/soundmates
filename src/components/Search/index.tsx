@@ -10,7 +10,6 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Loader from './Loader';
-import { useAuth, SignInButton } from '@clerk/clerk-react';
 import { useToast } from '@hooks/use-toast';
 
 type Props = {};
@@ -23,7 +22,6 @@ type FormData = z.infer<typeof schema>;
 
 const Search = (props: Props) => {
   const { toast } = useToast();
-  const { isSignedIn } = useAuth();
 
   const [tracks, setTracks] = useState<any[]>([]);
 
@@ -83,13 +81,7 @@ const Search = (props: Props) => {
         <form onSubmit={handleSubmit(onSubmit)} className="mt-7 mb-9 w-full max-w-sm">
           <div className="flex items-center space-x-2">
             <Input type="text" placeholder="Description" {...register('description')} />
-            {isSignedIn ? (
-              <Button type="submit">Search</Button>
-            ) : (
-              <SignInButton>
-                <Button type="button">Sign in with Google</Button>
-              </SignInButton>
-            )}
+            <Button type="submit">Search</Button>
           </div>
           {errors.description && <p className="text-red-500 mt-2">{errors.description.message}</p>}
         </form>
