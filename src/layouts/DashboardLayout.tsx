@@ -13,9 +13,9 @@ export default function DashboardLayout() {
       navigate('/');
       return;
     }
-    if (isSignedIn) {
-      navigate('/finish-sign-in');
-    }
+    // if (isSignedIn) {
+    //   navigate('/finish-sign-in');
+    // }
   }, [isSignedIn, navigate, user]);
 
   return <Outlet />;
