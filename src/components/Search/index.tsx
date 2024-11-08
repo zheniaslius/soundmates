@@ -108,7 +108,7 @@ const Search = (props: Props) => {
                     )}
                   </div>
                   {/* Track Information */}
-                  <div className="mt-2 flex justify-start items-center space-x-2">
+                  <div className="mt-2 flex justify-start space-x-2">
                     <a href={track.uri}>
                       <Spotify className="w-6 h-6 fill-brand-spotify cursor-pointer hover:brightness-90" />
                     </a>
