@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Loader from './Loader';
 import { useToast } from '@hooks/use-toast';
+import { PlayIcon, PauseIcon } from '@heroicons/react/24/solid'; // Added import
 
 type Props = {};
 
@@ -108,11 +109,20 @@ const Search = (props: Props) => {
                     )}
                   </div>
                   {/* Track Information */}
-                  <div className="mt-2 flex justify-start space-x-2">
+                  <div className="mt-2 flex items-start space-x-2">
                     <a href={track.uri}>
                       <Spotify className="w-6 h-6 fill-brand-spotify cursor-pointer hover:brightness-90" />
                     </a>
-                    <p className="text-center line-clamp-2">{track.name}</p>
+                    {track.preview_url && (
+                      <button onClick={() => handlePlayPause(track.preview_url)}>
+                        {audioUrl === track.preview_url ? (
+                          <PauseIcon className="w-6 h-6 cursor-pointer hover:brightness-90" />
+                        ) : (
+                          <PlayIcon className="w-6 h-6 cursor-pointer hover:brightness-90" />
+                        )}
+                      </button>
+                    )}
+                    <p className="flex-1 line-clamp-2">{track.name}</p>
                   </div>
                 </div>
               </BlurFade>
