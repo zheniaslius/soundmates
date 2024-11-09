@@ -81,7 +81,7 @@ const Search = (props: Props) => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-7 mb-9 w-full max-w-sm">
           <div className="flex items-center space-x-2">
-            <Input type="text" placeholder="Description" {...register('description')} />
+            <Input type="text" className="text-base" placeholder="Description" {...register('description')} />
             <Button type="submit">Search</Button>
           </div>
           {errors.description && <p className="text-red-500 mt-2">{errors.description.message}</p>}
